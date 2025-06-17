@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+.test-tło {
+    @apply bg-red-500 text-white rounded-2xl;
+}
+

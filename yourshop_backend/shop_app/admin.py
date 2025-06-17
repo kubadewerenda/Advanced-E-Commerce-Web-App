@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductImage, Category
+from .models import Product, ProductImage, Category, Cart, CartItem
 
 # Register your models here.
 class ProductImageInline(admin.TabularInline):
@@ -12,4 +12,4 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ("name", "sku")
 
 admin.site.register(Product, ProductAdmin)
-admin.site.register(Category)
+admin.site.register([Category, Cart, CartItem])
