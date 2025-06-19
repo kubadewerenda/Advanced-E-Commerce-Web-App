@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from .models import Product, ProductImage, Category, Cart, CartItem
-from .serializers import ProductSerializer, CategorySerializer
+from .serializers import ProductSerializer, CategorySerializer, DetailedProductSerializer
 from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework.pagination import PageNumberPagination
@@ -65,7 +65,7 @@ def products(request):
 @api_view(["GET"])
 def product_detail(request, slug):
     product = Product.objects.get(slug=slug)
-    serializer = ProductSerializer(product)
+    serializer = DetailedProductSerializer(product)
     return Response(serializer.data)
 
 

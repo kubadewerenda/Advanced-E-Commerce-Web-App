@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import api, { BASE_URL } from '../api/api'
 import { Link, useParams } from 'react-router-dom'
+import RelatedProducts from '../components/ProductDetails/RelatedProducts'
 
 const ProductDetails = () => {
     const [product, setProduct] = useState({})
@@ -17,13 +18,15 @@ const ProductDetails = () => {
         .then(res => {
             console.log(res.data)
             setProduct(res.data)
+            setCurrentImg(0)
+            window.scrollTo({top: 0, behavior: "smooth"})
         })
         .catch(err => {
             console.log(err.message)
             setError(err.message)
         })
         .finally(() => setLoading(false))
-    }, [])
+    }, [slug])
 
     if(loading){
         return (
@@ -68,12 +71,10 @@ const ProductDetails = () => {
                     <h1 className="text-3xl text-gray-950 font-medium">{product.name}</h1>
                     <hr />
                     <span className="text-sm text-gray-600 font-light">{`Kod produktu: ${product.sku}`}</span>    
-                    <p className="text-lg font-semibold">{`${product.price.replace(".",",")} zł/szt`}</p>                
+                    <p className="text-lg font-semibold">{`${product.price} zł/szt`}</p>                
                 </div>
             </div>  
-            <div>
-                            
-            </div>          
+            <RelatedProducts products={product.related_products}/>        
         </div>
     )
 }

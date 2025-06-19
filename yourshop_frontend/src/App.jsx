@@ -9,8 +9,8 @@ function App() {
         <BrowserRouter>
             <MainLayout>
                 <Routes>
-                    <Route path="/shop" element={<Shop />}></Route>
-                    <Route path="products/:slug" element={<ProductDetails />}></Route>
+                    <Route path="/shop" element={<Shop />} />
+                    <Route path="products/:slug" element={<ProductDetails />} />
                 </Routes> 
             </MainLayout>         
         </BrowserRouter>

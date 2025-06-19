@@ -18,6 +18,22 @@ class ProductSerializer(serializers.ModelSerializer):
             "price", "discount_price", "stock", "tax_rate", "is_active",
             "created_at", "modified_at", "images"]
         
+class DetailedProductSerializer(serializers.ModelSerializer):
+    related_products = serializers.SerializerMethodField()
+    images = ProductImageSerializer(many=True, read_only=True)
+    category = serializers.StringRelatedField()
+
+    class Meta:
+        model = Product
+        fields = ["id", "name", "sku", "slug", "description", "category",
+            "price", "discount_price", "stock", "images", "related_products"]
+    
+    def get_related_products(self, product):
+        products = Product.objects.filter(category=product.category).exclude(id=product.id)
+        serializer = ProductSerializer(products, many=True)
+        return serializer.data
+
+        
 class SubcategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
