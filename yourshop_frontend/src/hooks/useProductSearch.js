@@ -76,6 +76,7 @@ export default function useProductSearch() {
 
             api.get(url)
             .then(res => {
+                console.log(res.data.results)
                 setProducts(res.data.results)
                 setTotalCount(res.data.count)
                 setError("")

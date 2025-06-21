@@ -35,13 +35,9 @@ class Category(models.Model):
 #-------------------------------------------- Produkty -----------------------------------------------------
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    # sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField(max_length=1500)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="products")
-    # price = models.DecimalField(max_digits=10, decimal_places=2)
-    # discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    # stock = models.PositiveIntegerField(default=0)
     tax_rate = models.DecimalField(
         max_digits=4, decimal_places=2, default=23.00,
         help_text="Stawka VAT w % (np. 23.00, 8.00, 0.00)"
@@ -50,10 +46,6 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
-    # @staticmethod
-    # def generate_sku():
-    #     return f"PROD-{uuid.uuid4().hex[:8].upper()}"
-    
     def save(self, *args, **kwargs):
         if not self.slug or self.slug != slugify(self.name):
             self.slug = slugify(self.name)
@@ -68,33 +60,32 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class ProductAttribute(models.Model):
-    name = models.CharField(max_length=50)
+class ProductSpecification(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="specifications")
+    name = models.CharField("Nazwa specyfikacji", max_length=100)
+    value = models.CharField("Wartość", max_length=255)
+
+    class Meta:
+        verbose_name = "Specyfikacja produktu"
+        verbose_name_plural = "Specyfikacje produktu"
+        ordering = ["name"]
 
     def __str__(self):
-        return self.name
+        return f"{self.product.name} | {self.name} : {self.value}"
     
-class ProductAttributeValue(models.Model):
-    attribute = models.ForeignKey(ProductAttribute, on_delete=models.CASCADE, related_name="values")
-    value = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"{self.attribute.name}: {self.value}"
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variants")
+    size = models.CharField("Rozmiar", max_length=100, blank=True, null=True)
+    color = models.CharField("Kolor", max_length=100, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     stock = models.PositiveIntegerField(default=0)
     sku = models.CharField(max_length=100, unique=True, blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
-    attributes = models.ManyToManyField(
-        ProductAttributeValue,
-        through="ProductVariantAttributeValue",
-        related_name="variants",
-        blank=True
-    )
+    class Meta:
+        ordering = ["price"]
 
     @staticmethod
     def generate_sku():
@@ -106,19 +97,25 @@ class ProductVariant(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        attrs = ", ".join(str(a) for a in self.attributes.all())
-        return f"{self.product.name} ({attrs})" if attrs else self.product.name
+        display = f"{self.product.name}"
+        if self.size:
+            display += f" | Rozmiar: {self.size}"
+        if self.color:
+            display += f" | Kolor: {self.color}"
+        return display  
 
-class ProductVariantAttributeValue(models.Model):
-    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
-    attribute_value = models.ForeignKey(ProductAttributeValue, on_delete=models.CASCADE)
+class ProductVariantSpecification(models.Model):
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name="specifications")
+    name = models.CharField("Nazwa specyfikacji", max_length=100)
+    value = models.CharField("Wartość", max_length=255)
 
     class Meta:
-        unique_together = ("variant", "attribute_value")
+        verbose_name = "Specyfikacja wariantu"
+        verbose_name_plural = "Specyfikacje wariantu"
+        ordering = ["name"]
 
     def __str__(self):
-        return f"{self.variant} -> {self.attribute_value}"
-     
+        return f"{self.variant} | {self.name} : {self.value}"
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
@@ -138,7 +135,7 @@ class ProductImage(models.Model):
         
     def __str__(self):
         return f"{self.product.name} (Zdjęcie {self.id})"
-    
+     
 #-------------------------------------------- Koszyk -----------------------------------------------------
 class Cart(models.Model):
     cart_code = models.CharField(max_length=11, unique=True)

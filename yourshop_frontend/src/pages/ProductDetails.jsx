@@ -2,11 +2,18 @@ import React, { useEffect, useState } from 'react'
 import api, { BASE_URL } from '../api/api'
 import { Link, useParams } from 'react-router-dom'
 import RelatedProducts from '../components/ProductDetails/RelatedProducts'
+import ProductVariantsSelect from '../components/ProductDetails/ProductVariantsSelect'
+import ProductSpecifications from '../components/ProductDetails/ProductSpecifications'
 
 const ProductDetails = () => {
     const [product, setProduct] = useState({})
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
+
+    const [selectedVariantIndex, setSelectedVariantIndex] = useState(0)
+
+    const variants = product.variants || []
+    const selectedVariant = variants[selectedVariantIndex] || null
 
     const [currentImg, setCurrentImg] = useState(0)
 
@@ -38,7 +45,7 @@ const ProductDetails = () => {
 
 
     return (
-        <div className="max-w-screen-5xl mx-auto">
+        <div className="max-w-screen-lg mx-auto">
             <Link to="/shop" className="text-center" >Powrót do sklepu</Link>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-30 mt-10">
                 <div className="flex flex-col gap-5 w-full justify-center items-center">
@@ -47,7 +54,7 @@ const ProductDetails = () => {
                             src={
                                 product?.images?.[currentImg]?.image
                                 ? BASE_URL + product.images[currentImg].image
-                                : "https://via.placeholder.com/400x300?text=No+Image"
+                                : "https://placehold.co/600x400"
                             }
                             alt={product?.images?.[currentImg]?.alt_text || product?.name}
                             className="object-contain w-full h-full rounded-x"
@@ -71,10 +78,17 @@ const ProductDetails = () => {
                     <h1 className="text-3xl text-gray-950 font-medium">{product.name}</h1>
                     <hr />
                     <span className="text-sm text-gray-600 font-light">{`Kod produktu: ${product.sku}`}</span>    
-                    <p className="text-lg font-semibold">{`${product.price} zł/szt`}</p>                
+                    <p className="text-lg font-semibold">{`${product.price} zł/szt`}</p> 
+                    <ProductVariantsSelect 
+                        variants={variants} 
+                        selectedVariantIndex={selectedVariantIndex}
+                        setSelectedVariantIndex={setSelectedVariantIndex}
+                    />               
                 </div>
-            </div>  
-            <RelatedProducts products={product.related_products}/>        
+            </div> 
+            <ProductSpecifications mainSpecifications={product.specifications || []} variantSpecifications={selectedVariant?.specifications || []}/>
+            <RelatedProducts products={product.related_products}/>  
+                  
         </div>
     )
 }

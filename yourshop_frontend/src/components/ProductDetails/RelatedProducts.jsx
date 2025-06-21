@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 const RelatedProducts = ({products}) => {
     if(!products?.length) return null
     return (
-        <div className="my-12 max-w-screen-lg mx-auto">
+        <div className="my-12">
             <div className="flex items-center justify-start">
                 <h3 className="text-3xl text-gray-800 font-light">Powiązane produkty</h3>
             </div>
@@ -21,7 +21,7 @@ const RelatedProducts = ({products}) => {
                     pagination={{clickable: true}}
                     spaceBetween={10}
                     slidesPerView={2}
-                    loop={true}
+                    loop={products.length > 3}
                     breakpoints={{
                     640: { slidesPerView: 2 },
                     768: { slidesPerView: 2 },

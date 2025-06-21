@@ -1,51 +1,59 @@
 from django.contrib import admin
-from .models import Product, ProductImage, Category, Cart, CartItem, ProductVariant, ProductAttributeValue, ProductAttribute, ProductVariantAttributeValue
+from .models import (
+    Category, Product, ProductSpecification, ProductVariant, ProductImage,
+    Cart, CartItem, ProductVariantSpecification
+)
 
-# Register your models here.
+# ---------------- KATEGORIA ----------------
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "parent")
+    search_fields = ("name",)
+    prepopulated_fields = {"slug": ("name",)}
+
+# --------------- INLINE MODELE --------------
+class ProductSpecificationInline(admin.TabularInline):
+    model = ProductSpecification
+    extra = 1
+
+class ProductVariantSpecificationInline(admin.TabularInline):
+    model = ProductVariantSpecification
+    extra = 1
+
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
-    extra = 5
-
-class ProductVariantAttributeValueInline(admin.TabularInline):
-    model = ProductVariantAttributeValue
     extra = 1
 
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     extra = 1
-    show_change_link = True
+    show_change_link = True 
 
-
+# ---------------- PRODUKT -------------------
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [ProductImageInline, ProductVariantInline]
-    list_display = ("name", "category", "is_active")
+    list_display = ("name", "category", "is_active", "created_at")
     search_fields = ("name", "slug")
-    list_filter = ("category", "is_active")
     prepopulated_fields = {"slug": ("name",)}
+    inlines = [ProductSpecificationInline, ProductVariantInline, ProductImageInline]
+    list_filter = ("is_active", "category")
+    readonly_fields = ("created_at", "modified_at")
 
+@admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):
-    inlines = [ProductVariantAttributeValueInline]
-    list_display = ("product", "sku", "price", "discount_price", "stock", "is_active")
-    search_fields = ("product", "sku")
-    list_filter = ("product", "is_active")
+    inlines = [ProductVariantSpecificationInline]
+    list_display = ("product", "size", "color", "price", "sku")
 
-class ProductAttributeValueInline(admin.TabularInline):
-    model = ProductAttributeValue
-    extra = 1
+# ---------------- KOSZYK -------------------
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ("cart_code", "user", "paid", "created_at")
+    search_fields = ("cart_code",)
+    list_filter = ("paid",)
 
-class ProductAttributeAdmin(admin.ModelAdmin):
-    inlines = [ProductAttributeValueInline]
-    list_display = ("name",)
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ("cart", "product", "quantity", "added_at")
+    search_fields = ("cart__cart_code", "product__name")
 
-
-
-admin.site.register(Category)
-admin.site.register(Product, ProductAdmin)
-admin.site.register(ProductVariant, ProductVariantAdmin)
-admin.site.register(ProductAttribute, ProductAttributeAdmin)
-admin.site.register(ProductAttributeValue)
-admin.site.register(ProductVariantAttributeValue)
-admin.site.register(ProductImage)
-admin.site.register(Cart)
-admin.site.register(CartItem)
 

@@ -3,7 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from .models import Product, ProductImage, Category, Cart, CartItem
 from .serializers import ProductSerializer, CategorySerializer, DetailedProductSerializer
 from rest_framework.response import Response
-from django.db.models import Q
+from rest_framework import status
+from django.db.models import Q, Min, F, DecimalField, Case, When
 from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
@@ -24,7 +25,6 @@ def products(request):
 
     products = Product.objects.filter(
         Q(name__icontains=q) |
-        Q(sku__icontains=q) |
         Q(description__icontains=q)
     )
 
@@ -36,23 +36,50 @@ def products(request):
 
     if subcategory_slug:
         products = products.filter(category__slug=subcategory_slug, category__parent__isnull=False)
-    
+
+    products = products.annotate(
+        min_variant_price=Min(
+            Case(
+                When(variants__discount_price__isnull=False, then=F("variants__discount_price")),
+                default=F("variants__price"),
+                output_field=DecimalField(max_digits=10, decimal_places=2)
+            )
+        )
+    )
+
     if price_min:
         try:
-            products = products.filter(price__gte=float(price_min))
+            products = products.filter(min_variant_price__gte=float(price_min))
         except ValueError:
             pass
 
     if price_max:
         try:
-            products = products.filter(price__lte=float(price_max))
+            products = products.filter(min_variant_price__lte=float(price_max))
         except ValueError:
             pass
     
-    if ordering:
-        allowed_orderings = ["price", "-price", "created_at", "-created_at"]
-        if ordering in allowed_orderings:
-            products = products.order_by(ordering)
+    if ordering in ["price", "-price"]:
+        products = products.order_by("min_variant_price" if ordering == "price" else "-min_variant_price")
+    elif ordering in ["created_at", "-created_at"]:
+        products = products.order_by(ordering)
+    
+    # if price_min:
+    #     try:
+    #         products = products.filter(price__gte=float(price_min))
+    #     except ValueError:
+    #         pass
+
+    # if price_max:
+    #     try:
+    #         products = products.filter(price__lte=float(price_max))
+    #     except ValueError:
+    #         pass
+    
+    # if ordering:
+    #     allowed_orderings = ["price", "-price", "created_at", "-created_at"]
+    #     if ordering in allowed_orderings:
+    #         products = products.order_by(ordering)
 
     #========= PAGINACJA =========
     paginator = PageNumberPagination()
@@ -64,7 +91,11 @@ def products(request):
 
 @api_view(["GET"])
 def product_detail(request, slug):
-    product = Product.objects.get(slug=slug)
+    try:
+        product = Product.objects.get(slug=slug)
+    except Product.DoesNotExist:
+        return Response({"message": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    
     serializer = DetailedProductSerializer(product)
     return Response(serializer.data)
 
