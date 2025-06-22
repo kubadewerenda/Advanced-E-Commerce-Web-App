@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import RelatedProducts from '../components/ProductDetails/RelatedProducts'
 import ProductVariantsSelect from '../components/ProductDetails/ProductVariantsSelect'
 import ProductSpecifications from '../components/ProductDetails/ProductSpecifications'
+import CustomNumInput from '../components/ui/CustomInputs/CustomNumInput'
 
 const ProductDetails = () => {
     const [product, setProduct] = useState({})
@@ -16,6 +17,8 @@ const ProductDetails = () => {
     const selectedVariant = variants[selectedVariantIndex] || null
 
     const [currentImg, setCurrentImg] = useState(0)
+
+    const [quantity, setQuantity] = useState(1)
 
     const {slug} = useParams();
 
@@ -34,6 +37,9 @@ const ProductDetails = () => {
         })
         .finally(() => setLoading(false))
     }, [slug])
+
+    const price = selectedVariant?.discount_price ? <span className="text-red-600"><span className="line-through text-gray-700 mr-2">{selectedVariant?.price.replace(".", ",")}</span>{selectedVariant?.discount_price.replace(".", ",")} zł</span> :
+        <span className="text-gray-700">{selectedVariant?.price.replace(".", ",")} zł</span>
 
     if(loading){
         return (
@@ -74,17 +80,50 @@ const ProductDetails = () => {
                         )}
                     </div>
                 </div>
-                <div className="flex flex-col gap-y-2 w-full">
-                    <h1 className="text-3xl text-gray-950 font-medium">{product.name}</h1>
-                    <hr />
-                    <span className="text-sm text-gray-600 font-light">{`Kod produktu: ${product.sku}`}</span>    
-                    <p className="text-lg font-semibold">{`${product.price} zł/szt`}</p> 
-                    <ProductVariantsSelect 
-                        variants={variants} 
-                        selectedVariantIndex={selectedVariantIndex}
-                        setSelectedVariantIndex={setSelectedVariantIndex}
-                    />               
-                </div>
+                <div className="w-full rounded-sm bg-gray-100 shadow-lg p-6 mx-auto flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <h1 className="text-4xl font-bold text-gray-900">{product.name}</h1>
+                        <span className="text-sm text-gray-400">{selectedVariant ? `Kod produktu: ${selectedVariant.sku}` : "Ładowanie..."}</span>
+                    </div>
+
+                    {selectedVariant && (
+                        <div className="flex items-end mt-2">
+                            <p className="text-3xl font-extrabold">
+                                {price}
+                                <span className="text-lg text-gray-800 ml-1 font-light">/ szt</span>
+                            </p>
+                        </div>
+                    )}
+
+                    <div>
+                        <ProductVariantsSelect 
+                            variants={variants}
+                            selectedVariantIndex={selectedVariantIndex}
+                            setSelectedVariantIndex={setSelectedVariantIndex}
+                            setQuantity={setQuantity}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="mb-1 block text-sm text-gray-400">Liczba sztuk</label>
+                        <CustomNumInput 
+                        stock={selectedVariant?.stock || 0}
+                        quantity={quantity}
+                        setQuantity={setQuantity}
+                        />
+                        <span className="text-sm text-gray-400">{`z ${selectedVariant?.stock ?? 0} sztuk`}</span>
+                    </div>
+
+                    <div className="flex flex-col gap-3 mt-2">
+                        <button className="w-full bg-gray-500 hover:bg-gray-600 text-white rounded text-lg py-3 font-bold tracking-widest transition">
+                        DODAJ DO KOSZYKA
+                        </button>
+                        <button className="w-full bg-gray-500 hover:bg-gray-600 text-white rounded text-lg py-3 font-bold tracking-widest transition">
+                        KUP I ZAPŁAĆ
+                        </button>
+                    </div>
+                    </div>
+
             </div> 
             <ProductSpecifications mainSpecifications={product.specifications || []} variantSpecifications={selectedVariant?.specifications || []}/>
             <RelatedProducts products={product.related_products}/>  

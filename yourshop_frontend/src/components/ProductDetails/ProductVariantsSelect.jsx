@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { RiArrowDropUpLine } from "react-icons/ri";
 
-const ProductVariantsSelect = ({variants, selectedVariantIndex, setSelectedVariantIndex}) => {
+const ProductVariantsSelect = ({variants, selectedVariantIndex, setSelectedVariantIndex, setQuantity}) => {
     const [open, setOpen] = useState(false)
     const ref = useRef(null)
 
@@ -25,6 +25,7 @@ const ProductVariantsSelect = ({variants, selectedVariantIndex, setSelectedVaria
 
     return (
         <div className="relative w-60" ref={ref}>
+            <label className="text-lg text-gray-700 font-medium">Wybierz rodzaj:</label>
             <button 
                 type="button"
                 className="w-full border-b-2 border-gray-800 bg-white text-left text-lg font-semibold text-gray-700 flex justify-between items-center"
@@ -40,6 +41,7 @@ const ProductVariantsSelect = ({variants, selectedVariantIndex, setSelectedVaria
                             key={v.id}
                             onClick={() => {
                                 setSelectedVariantIndex(index)
+                                setQuantity(1)
                                 setOpen(false)
                             }}
                             className={`p-2 hover:bg-gray-400 text-lg border-b cursor-pointer ${index === selectedVariantIndex ? "bg-gray-300 font-semibold" : ""}`}

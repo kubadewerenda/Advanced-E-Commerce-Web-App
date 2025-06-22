@@ -6,8 +6,8 @@ const ProductSpecifications = ({mainSpecifications, variantSpecifications}) => {
             <h3 className="text-3xl font-semibold text-gray-800">Parametry</h3>
             <table className="w-full mt-8 border-2 border-gray-300 rounded shadow table-fixed">
                 <colgroup>
-                    <col className="w-2/5" />  {/* Parametr */}
-                    <col className="w-3/5 min-w-[200px]" />  {/* Wartość */}
+                    <col className="w-2/5" />
+                    <col className="w-3/5 min-w-[200px]" />
                 </colgroup>
                 <thead>
                     <tr className="bg-gray-100 text-gray-700 border-b-2 border-gray-300">

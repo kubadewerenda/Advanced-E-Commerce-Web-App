@@ -23,13 +23,18 @@ class ProductVariantSpecificationSerializer(serializers.ModelSerializer):
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     specifications = ProductVariantSpecificationSerializer(many=True, read_only=True)
+    discount_percent = serializers.SerializerMethodField()
     
     class Meta:
         model = ProductVariant
         fields = [
             "id", "size", "color", "price", "discount_price",
-            "stock", "sku", "is_active", "specifications"
+            "stock", "sku", "is_active", "specifications", "discount_percent"
         ]
+    
+    def get_discount_percent(self,variant):
+        if variant.discount_price:
+            return round(100 * (variant.price - variant.discount_price) / variant.price)
 
 class ProductSerializer(serializers.ModelSerializer):
     variants = ProductVariantSerializer(many=True, read_only=True)
@@ -37,18 +42,26 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     category = serializers.StringRelatedField()
     main_variant = serializers.SerializerMethodField()
+    num_of_promotions = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = [
             "id", "name", "slug", "description", "category",
             "tax_rate", "is_active", "created_at", "modified_at",
-            "images", "specifications", "variants", "main_variant"
+            "images", "specifications", "variants", "main_variant", "num_of_promotions"
         ]
     
     def get_main_variant(self, product):
         cheapest = product.variants.filter(is_active=True).first()
         return ProductVariantSerializer(cheapest).data if cheapest else None
+    
+    def get_num_of_promotions(self, product):
+        count = 0
+        for v in product.variants.all():
+            if v.discount_price:
+                count += 1
+        return count
     
         
 class DetailedProductSerializer(serializers.ModelSerializer):
@@ -58,12 +71,13 @@ class DetailedProductSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()
     related_products = serializers.SerializerMethodField()
     main_variant = serializers.SerializerMethodField()
+    promotions = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = [
             "id", "name", "slug", "description", "category", "tax_rate", "is_active", "created_at",
-             "images", "specifications", "variants", "main_variant", "related_products"
+             "images", "specifications", "variants", "main_variant", "related_products", "promotions"
             ]
     
     def get_related_products(self, product):
@@ -74,6 +88,21 @@ class DetailedProductSerializer(serializers.ModelSerializer):
     def get_main_variant(self, product):
         cheapest = product.variants.filter(is_active=True).first()
         return ProductVariantSerializer(cheapest).data if cheapest else None
+    
+    def get_promotions(self, product):
+        promotions = []
+
+        for v in product.variants.all():
+            if v.discount_price:
+                variant_promo = {}
+                if v.size:
+                    variant_promo["size"] = v.size
+                elif v.color:
+                    variant_promo["color"] = v.color
+                else:
+                    variant_promo["variant"] = "Standard"
+                promotions.append(variant_promo)        
+        return promotions
 
         
 class SubcategorySerializer(serializers.ModelSerializer):
