@@ -8,8 +8,8 @@ const ProductCard = ({product}) => {
         <div className="relative bg-gray-200 rounded-xl shadow-md flex transition hover:scale-105 hover:shadow-xl duration-200 min-w-[340px] min-h-[180px] max-w-full p-2 gap-2">
             <Link to={`/products/${product.slug}`}>
                 {product.num_of_promotions > 0 && 
-                    <div className="absolute left-1/2 top-0 -translate-x-1/2 w-fit rounded-b-2xl p-2 bg-orange-600">
-                        <span className="block text-sm font-light text-gray-300">Promocje: {product.num_of_promotions}!</span>
+                    <div className="absolute left-1/2 top-0 -translate-x-1/2 w-fit rounded-b-2xl p-2 bg-orange-600 shadow-lg">
+                        <span className="block text-sm font-light text-white">Promocje: {product.num_of_promotions}!</span>
                     </div>
                 }
                 <div className="flex flex-col items-center justify-center">

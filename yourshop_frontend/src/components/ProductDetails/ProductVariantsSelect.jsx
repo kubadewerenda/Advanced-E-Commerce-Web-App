@@ -25,7 +25,7 @@ const ProductVariantsSelect = ({variants, selectedVariantIndex, setSelectedVaria
 
     return (
         <div className="relative w-60" ref={ref}>
-            <label className="text-lg text-gray-700 font-medium">Wybierz rodzaj:</label>
+            <label className="text-sm text-gray-700 font-medium">Wybierz {variants[0]?.size ? "rozmiar" : "kolor"}:</label>
             <button 
                 type="button"
                 className="w-full border-b-2 border-gray-800 bg-white text-left text-lg font-semibold text-gray-700 flex justify-between items-center"

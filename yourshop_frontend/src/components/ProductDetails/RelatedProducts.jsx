@@ -8,13 +8,11 @@ import { Link } from 'react-router-dom'
 
 const RelatedProducts = ({products}) => {
     if(!products?.length) return null
+
     return (
-        <div className="my-12">
-            <div className="flex items-center justify-start">
-                <h3 className="text-3xl text-gray-800 font-light">Powiązane produkty</h3>
-            </div>
-            <hr />
-            <div className="mt-5">
+        <div className="my-12 mt-10 w-full rounded-sm bg-gray-200 shadow-lg p-6 mx-auto flex flex-col gap-6">
+            <h3 className="text-3xl font-bold text-gray-800">Powiązane produkty</h3>
+            <div>
                 <Swiper
                     modules={[Navigation, Pagination, Autoplay]}
                     navigation
@@ -48,7 +46,7 @@ const RelatedProducts = ({products}) => {
                                     <div className="font-light text-sm line-clamp-2">{`${prod.description.slice(0,30)}...`}</div>
                                     <div className="flex-end font-bold text-base text-gray-600 mt-auto">
                                         <p>
-                                            {prod.price} zł
+                                            {prod.variants[0]?.price} zł
                                         </p>
                                     </div>
                                 </div>

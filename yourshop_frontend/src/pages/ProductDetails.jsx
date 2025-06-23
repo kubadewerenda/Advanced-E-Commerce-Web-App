@@ -5,6 +5,7 @@ import RelatedProducts from '../components/ProductDetails/RelatedProducts'
 import ProductVariantsSelect from '../components/ProductDetails/ProductVariantsSelect'
 import ProductSpecifications from '../components/ProductDetails/ProductSpecifications'
 import CustomNumInput from '../components/ui/CustomInputs/CustomNumInput'
+import ProductDescription from '../components/ProductDetails/ProductDescription'
 
 const ProductDetails = () => {
     const [product, setProduct] = useState({})
@@ -24,6 +25,7 @@ const ProductDetails = () => {
 
     useEffect(() => {
         setLoading(true)
+
         api.get(`api/products/${slug}`)
         .then(res => {
             console.log(res.data)
@@ -36,9 +38,12 @@ const ProductDetails = () => {
             setError(err.message)
         })
         .finally(() => setLoading(false))
+
+        // const maxProducts = 5
+        // const viewed = JSON.
     }, [slug])
 
-    const price = selectedVariant?.discount_price ? <span className="text-red-600"><span className="line-through text-gray-700 mr-2">{selectedVariant?.price.replace(".", ",")}</span>{selectedVariant?.discount_price.replace(".", ",")} zł</span> :
+    const price = selectedVariant?.discount_price ? <span className="text-orange-600"><span className="line-through text-gray-700 mr-2">{selectedVariant?.price.replace(".", ",")}</span>{selectedVariant?.discount_price.replace(".", ",")} zł</span> :
         <span className="text-gray-700">{selectedVariant?.price.replace(".", ",")} zł</span>
 
     if(loading){
@@ -80,17 +85,35 @@ const ProductDetails = () => {
                         )}
                     </div>
                 </div>
-                <div className="w-full rounded-sm bg-gray-100 shadow-lg p-6 mx-auto flex flex-col gap-6">
+                <div className="w-full rounded-sm bg-gray-200 shadow-lg p-6 mx-auto flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
                         <h1 className="text-4xl font-bold text-gray-900">{product.name}</h1>
                         <span className="text-sm text-gray-400">{selectedVariant ? `Kod produktu: ${selectedVariant.sku}` : "Ładowanie..."}</span>
                     </div>
+                    
+                    {product.promotions?.length > 0 && (
+                        <div className="flex flex-col items-start mt-2">
+                            <span className="bg-orange-600 text-sm text-white font-semibold rounded-l-md rounded-r-2xl px-3 py-1 mb-1 shadow">
+                            Promocje!
+                            </span>
+                            <span className="text-gray-800 text-sm">
+                            Dostępne dla&nbsp;
+                            {product.promotions[0].size ? "rozmiarów" : "kolorów"}:&nbsp;
+                            <span className="font-semibold">
+                                {product.promotions
+                                .map(promo => promo.size || promo.color)
+                                .join(", ")}
+                            </span>
+                            </span>
+                        </div>
+                    )}
 
                     {selectedVariant && (
                         <div className="flex items-end mt-2">
                             <p className="text-3xl font-extrabold">
                                 {price}
                                 <span className="text-lg text-gray-800 ml-1 font-light">/ szt</span>
+                                {selectedVariant?.discount_percent !== null && <span className="bg-orange-600 text-xl text-white font-semibold rounded-l-md rounded-r-2xl ml-4 p-1.5">-{selectedVariant?.discount_percent}% zniżki</span>}
                             </p>
                         </div>
                     )}
@@ -122,10 +145,10 @@ const ProductDetails = () => {
                         KUP I ZAPŁAĆ
                         </button>
                     </div>
-                    </div>
-
+                </div>
             </div> 
             <ProductSpecifications mainSpecifications={product.specifications || []} variantSpecifications={selectedVariant?.specifications || []}/>
+            <ProductDescription description={product.description}/>
             <RelatedProducts products={product.related_products}/>  
                   
         </div>
