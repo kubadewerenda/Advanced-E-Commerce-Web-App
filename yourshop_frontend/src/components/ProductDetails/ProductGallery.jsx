@@ -68,7 +68,7 @@ const ProductGallery = ({images = [], currentImg, setCurrentImg}) => {
                         ×
                         </button>
                         <button 
-                            className="absolute top-0 left-0 w-1/2 h-full bg-black/30"
+                            className="absolute top-0 left-0 w-1/2 h-full bg-transparent"
                             onClick={e => {
                                 e.stopPropagation()
                                 if(currentImg > 0) setCurrentImg(i => i - 1)
@@ -76,7 +76,7 @@ const ProductGallery = ({images = [], currentImg, setCurrentImg}) => {
                         >
                         </button>
                         <button 
-                            className="absolute top-0 right-0 w-1/2 h-full bg-black/30"
+                            className="absolute top-0 right-0 w-1/2 h-full bg-transparent"
                             onClick={e => {
                                 e.stopPropagation()
                                 if(currentImg < (images?.length - 1)) setCurrentImg(i => i + 1)

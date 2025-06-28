@@ -15,6 +15,7 @@ const ProductInfo = ({
 }) => {
     const price = selectedVariant?.discount_price ? <span className="text-orange-600"><span className="line-through text-gray-700 mr-2">{selectedVariant?.price.replace(".", ",")}</span>{selectedVariant?.discount_price.replace(".", ",")} zł</span> :
         <span className="text-gray-700">{selectedVariant?.price.replace(".", ",")} zł</span>
+        
     return (
         <div className="col-span-2 w-full rounded-sm bg-gray-200 shadow-lg p-6 mx-auto flex flex-col gap-6">
             <div className="flex flex-col gap-2">
@@ -61,9 +62,9 @@ const ProductInfo = ({
             <div>
                 <label className="mb-1 block text-sm text-gray-400">Liczba sztuk</label>
                 <CustomNumInput 
-                stock={selectedVariant?.stock || 0}
-                quantity={quantity}
-                setQuantity={setQuantity}
+                    stock={selectedVariant?.stock || 0}
+                    quantity={quantity}
+                    setQuantity={setQuantity}
                 />
                 <span className="text-sm text-gray-400">{`z ${selectedVariant?.stock ?? 0} sztuk`}</span>
             </div>
