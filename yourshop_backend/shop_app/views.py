@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
-from .models import Product, ProductImage, Category, Cart, CartItem
+from .models import Product, ProductImage, Category
 from .serializers import ProductSerializer, CategorySerializer, DetailedProductSerializer
 from rest_framework.response import Response
 from rest_framework import status

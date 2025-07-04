@@ -28,7 +28,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
         fields = [
-            "id", "size", "color", "price", "discount_price",
+            "id", "variant_name", "price", "discount_price",
             "stock", "sku", "is_active", "specifications", "discount_percent"
         ]
     
@@ -95,10 +95,12 @@ class DetailedProductSerializer(serializers.ModelSerializer):
         for v in product.variants.all():
             if v.discount_price:
                 variant_promo = {}
-                if v.size:
-                    variant_promo["size"] = v.size
-                elif v.color:
-                    variant_promo["color"] = v.color
+                if v.variant_name:
+                    variant_promo["name"] = v.variant_name
+                # if v.size:
+                #     variant_promo["size"] = v.size
+                # elif v.color:
+                #     variant_promo["color"] = v.color
                 else:
                     variant_promo["variant"] = "Standard"
                 promotions.append(variant_promo)        

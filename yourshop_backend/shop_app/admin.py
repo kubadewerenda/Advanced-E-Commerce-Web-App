@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Category, Product, ProductSpecification, ProductVariant, ProductImage,
-    Cart, CartItem, ProductVariantSpecification
+    Category, Product, ProductSpecification, ProductVariant, ProductImage, ProductVariantSpecification
 )
 
 # ---------------- KATEGORIA ----------------
@@ -42,18 +41,19 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):
     inlines = [ProductVariantSpecificationInline]
-    list_display = ("product", "size", "color", "price", "sku")
+    # list_display = ("product", "size", "color", "price", "sku")
+    list_display = ("product", "variant_name", "price")
 
-# ---------------- KOSZYK -------------------
-@admin.register(Cart)
-class CartAdmin(admin.ModelAdmin):
-    list_display = ("cart_code", "user", "paid", "created_at")
-    search_fields = ("cart_code",)
-    list_filter = ("paid",)
+# # ---------------- KOSZYK -------------------
+# @admin.register(Cart)
+# class CartAdmin(admin.ModelAdmin):
+#     list_display = ("cart_code", "user", "paid", "created_at")
+#     search_fields = ("cart_code",)
+#     list_filter = ("paid",)
 
-@admin.register(CartItem)
-class CartItemAdmin(admin.ModelAdmin):
-    list_display = ("cart", "product", "quantity", "added_at")
-    search_fields = ("cart__cart_code", "product__name")
+# @admin.register(CartItem)
+# class CartItemAdmin(admin.ModelAdmin):
+#     list_display = ("cart", "product", "quantity", "added_at")
+#     search_fields = ("cart__cart_code", "product__name")
 
 

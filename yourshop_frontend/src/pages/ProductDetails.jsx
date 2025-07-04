@@ -70,7 +70,7 @@ const ProductDetails = () => {
     }
 
     const variants = product.variants || []
-    const selectedVariant = variants[selectedVariantIndex] || null    
+    const selectedVariant = variants[selectedVariantIndex] || null 
 
     return (
         <div className="max-w-screen-lg mx-auto">

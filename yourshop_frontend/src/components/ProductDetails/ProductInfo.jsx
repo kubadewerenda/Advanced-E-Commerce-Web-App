@@ -3,6 +3,7 @@ import CustomNumInput from "../ui/CustomInputs/CustomNumInput"
 import { TbTruckDelivery } from "react-icons/tb"
 import { MdOutlineForward30 } from "react-icons/md"
 import { LuWallet } from "react-icons/lu"
+import api from "../../api/api"
 
 const ProductInfo = ({
     product,
@@ -11,10 +12,25 @@ const ProductInfo = ({
     setSelectedVariantIndex,
     variants,
     quantity,
-    setQuantity
+    setQuantity,
 }) => {
+    const cart_code = localStorage.getItem("cart_code");
+
     const price = selectedVariant?.discount_price ? <span className="text-orange-600"><span className="line-through text-gray-700 mr-2">{selectedVariant?.price.replace(".", ",")}</span>{selectedVariant?.discount_price.replace(".", ",")} zł</span> :
         <span className="text-gray-700">{selectedVariant?.price.replace(".", ",")} zł</span>
+
+    const newItem = {cart_code: cart_code, variant_sku: selectedVariant?.sku, quantity: quantity}
+
+    function addProductToCart(){
+        console.log(selectedVariant.sku)
+        api.post("api/add_to_cart/", newItem)
+        .then(res => {
+            console.log(res.data)
+        })
+        .catch(err => {
+            console.log(err.message)
+        })
+    }
         
     return (
         <div className="col-span-2 w-full rounded-sm bg-gray-200 shadow-lg p-6 mx-auto flex flex-col gap-6">
@@ -29,11 +45,10 @@ const ProductInfo = ({
                     Promocje!
                     </span>
                     <span className="text-gray-800 text-sm">
-                    Dostępne dla&nbsp;
-                    {product.promotions[0].size ? "rozmiarów" : "kolorów"}:&nbsp;
+                    Dostępne dla wariantów:&nbsp;
                     <span className="font-semibold">
                         {product.promotions
-                        .map(promo => promo.size || promo.color)
+                        .map(promo => promo.name)
                         .join(", ")}
                     </span>
                     </span>
@@ -70,7 +85,10 @@ const ProductInfo = ({
             </div>
 
             <div className="flex flex-col gap-3 mt-2">
-                <button className="w-full bg-gray-500 hover:bg-gray-600 text-white rounded text-lg py-3 font-bold tracking-widest transition">
+                <button 
+                    onClick={addProductToCart}
+                    disabled={!selectedVariant}
+                    className="w-full bg-gray-500 hover:bg-gray-600 text-white rounded text-lg py-3 font-bold tracking-widest transition">
                 DODAJ DO KOSZYKA
                 </button>
                 <button className="w-full bg-gray-500 hover:bg-gray-600 text-white rounded text-lg py-3 font-bold tracking-widest transition">

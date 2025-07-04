@@ -18,14 +18,14 @@ const ProductVariantsSelect = ({variants, selectedVariantIndex, setSelectedVaria
 
     function getVariantLabel(v){
         if (!v) return "Brak danych";
-        return [v.size, v.color].filter(Boolean).join(" / ") || "Standard"
+        return [v.variant_name].filter(Boolean).join(" / ") || "Standard"
     }
 
     if(variants.length === 1) return null
 
     return (
         <div className="relative w-60" ref={ref}>
-            <label className="text-sm text-gray-700 font-medium">Wybierz {variants[0]?.size ? "rozmiar" : "kolor"}:</label>
+            <label className="text-sm text-gray-700 font-medium">Wybierz wariant:</label>
             <button 
                 type="button"
                 className="w-full border-b-2 border-gray-800 bg-white text-left text-lg font-semibold text-gray-700 flex justify-between items-center"

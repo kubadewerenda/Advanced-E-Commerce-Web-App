@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'core',
     'users',
     'shop_app',
+    'cart',
     'corsheaders',
     'rest_framework',
 ]
