@@ -13,7 +13,7 @@ import { LuWallet } from "react-icons/lu"
 import ProductGallery from '../components/ProductDetails/ProductGallery'
 import ProductInfo from '../components/ProductDetails/ProductInfo'
 
-const ProductDetails = () => {
+const ProductDetails = ({setNumCartItems, setTotalValue}) => {
     const [product, setProduct] = useState({})
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
@@ -89,6 +89,8 @@ const ProductDetails = () => {
                     variants={variants}
                     quantity={quantity}
                     setQuantity={setQuantity}
+                    setNumCartItems={setNumCartItems} 
+                    setTotalValue={setTotalValue}
                 />
             </div> 
             <ProductSpecifications mainSpecifications={product.specifications || []} variantSpecifications={selectedVariant?.specifications || []}/>

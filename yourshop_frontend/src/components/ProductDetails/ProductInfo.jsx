@@ -4,6 +4,7 @@ import { TbTruckDelivery } from "react-icons/tb"
 import { MdOutlineForward30 } from "react-icons/md"
 import { LuWallet } from "react-icons/lu"
 import api from "../../api/api"
+import { useState } from "react"
 
 const ProductInfo = ({
     product,
@@ -13,19 +14,26 @@ const ProductInfo = ({
     variants,
     quantity,
     setQuantity,
+    setNumCartItems,
+    setTotalValue
 }) => {
-    const cart_code = localStorage.getItem("cart_code");
+    const [cartCode, setCartCode] = useState(localStorage.getItem("cart_code"))
 
     const price = selectedVariant?.discount_price ? <span className="text-orange-600"><span className="line-through text-gray-700 mr-2">{selectedVariant?.price.replace(".", ",")}</span>{selectedVariant?.discount_price.replace(".", ",")} zł</span> :
         <span className="text-gray-700">{selectedVariant?.price.replace(".", ",")} zł</span>
 
-    const newItem = {cart_code: cart_code, variant_sku: selectedVariant?.sku, quantity: quantity}
+    const newItem = {cart_code: cartCode, variant_sku: selectedVariant?.sku, quantity: quantity}
 
     function addProductToCart(){
-        console.log(selectedVariant.sku)
         api.post("api/add_to_cart/", newItem)
         .then(res => {
             console.log(res.data)
+            if(res.data.cart_code){
+                localStorage.setItem("cart_code", res.data.cart_code)
+                setCartCode(res.data.cart_code)
+            }
+            setNumCartItems(n => n + quantity)
+            setTotalValue(t => Number((t + ((selectedVariant.discount_price ? selectedVariant.discount_price : selectedVariant.price) * quantity)).toFixed(2)))
         })
         .catch(err => {
             console.log(err.message)

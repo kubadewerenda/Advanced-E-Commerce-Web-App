@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Cart, CartItem
 from shop_app.models import ProductVariant
-from .serializers import CartSerializer, CartItemSerializer
+from .serializers import CartSerializer, CartItemSerializer, CartNumItemsSerializer
 
 # Create your views here.
 @api_view(["POST"])
@@ -21,9 +21,10 @@ def add_to_cart(request):
     except ProductVariant.DoesNotExist:
         return Response({"error": "Nie znaleziono variantu o tym SKU."}, status=404)
     
-    cart = Cart.objects.filter(cart_code=cart_code, paid=False).first() if cart_code else None
+    cart = Cart.objects.filter(cart_code=cart_code).first() if cart_code else None
     if not cart:
         cart = Cart.objects.create()
+        cart_code = cart.cart_code
 
     cart_item, created = CartItem.objects.get_or_create(cart=cart, variant=variant)
     if not created:
@@ -32,8 +33,30 @@ def add_to_cart(request):
         cart_item.quantity = quantity
     cart_item.save()
 
-    serializer = CartSerializer(cart)
+    serializer = CartItemSerializer(cart_item)
     return Response({
+        "cart_code": cart_code,
         "data": serializer.data, 
         "message": "Poprawnie stworzono cart item"
         }, status=201)
+
+
+@api_view(["GET"])
+def cart_num_of_items(request):
+    cart_code = request.query_params.get("cart_code")
+    try:
+        cart = Cart.objects.get(cart_code=cart_code, paid=False)
+        serializer = CartNumItemsSerializer(cart)
+        return Response(serializer.data) 
+    except Cart.DoesNotExist:
+        return Response({"error": "Nie ma takiego koszyka."}, status=404)
+
+@api_view(["GET"])
+def cart(request, cart_code):
+    try:
+        cart = Cart.objects.get(cart_code=cart_code, paid=False)
+
+        serializer = CartSerializer(cart)
+        return Response(serializer.data)
+    except Cart.DoesNotExist:
+        return Response({"error": "Nie ma takiego koszyka."}, status=404)
