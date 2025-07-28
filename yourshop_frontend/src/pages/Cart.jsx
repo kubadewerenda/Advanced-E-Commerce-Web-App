@@ -1,9 +1,33 @@
-import React from 'react'
+import { useEffect, useState } from "react"
+import api from "../api/api"
+import useCartData from "../hooks/useCartData"
+import CartItems from "../components/Cart/CartItems"
+
 
 const Cart = () => {
-  return (
-    <div>Cart</div>
-  )
+    const {cartItems, setCartItems, cartTotal, setCartTotal, loading} = useCartData()
+
+    if(loading){
+        return <p>Ładowanie...</p>
+    }
+
+    if(cartItems.length < 1){
+        return (
+          <div className="flex justify-center items-center text-xl text-black">
+              Koszyk jest pusty!
+          </div>
+        )
+    }
+
+    return (
+      <div className="max-w-screen-lg mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-x-10 mt-10">
+              <CartItems 
+                  cartItems={cartItems}
+              />  
+          </div>
+      </div>
+    )
 }
 
 export default Cart

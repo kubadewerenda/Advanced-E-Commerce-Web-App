@@ -21,7 +21,21 @@ class ProductVariantSpecificationSerializer(serializers.ModelSerializer):
         model = ProductVariantSpecification
         fields = ["id", "name", "value"]
 
+class ProductShortSerializer(serializers.ModelSerializer):
+    main_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ["id", "name", "slug", "tax_rate", "main_image"]
+
+    def get_main_image(self, product):
+        img = product.images.first()
+        if img:
+            return img.image.url
+        return None
+
 class ProductVariantSerializer(serializers.ModelSerializer):
+    product = ProductShortSerializer(read_only=True)
     specifications = ProductVariantSpecificationSerializer(many=True, read_only=True)
     discount_percent = serializers.SerializerMethodField()
     
@@ -29,7 +43,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         model = ProductVariant
         fields = [
             "id", "variant_name", "price", "discount_price",
-            "stock", "sku", "is_active", "specifications", "discount_percent"
+            "stock", "sku", "is_active", "specifications", "discount_percent", "product"
         ]
     
     def get_discount_percent(self,variant):

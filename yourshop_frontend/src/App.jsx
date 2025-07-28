@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import MainLayout from "./layouts/MainLayout"
 import Shop from "./pages/Shop"
 import ProductDetails from "./pages/ProductDetails"
+import Cart from "./pages/Cart"
 import { useEffect, useState } from "react"
 import api from "./api/api"
 
@@ -32,7 +33,7 @@ const App = () => {
                 <Routes>
                     <Route path="/shop" element={<Shop />} />
                     <Route path="products/:slug" element={<ProductDetails setNumCartItems={setNumCartItems} setTotalValue={setTotalValue} />} />
-                    <Route path="" />
+                    <Route path="koszyk/:cart_code" element={<Cart setNumCartItems={setNumCartItems}/>} />
                 </Routes> 
             </MainLayout>         
         </BrowserRouter>

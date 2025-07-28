@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Cart, CartItem
+from shop_app.models import Product
 from shop_app.serializers import ProductVariantSerializer
+
 
 class CartItemSerializer(serializers.ModelSerializer):
     variant = ProductVariantSerializer(read_only=True)

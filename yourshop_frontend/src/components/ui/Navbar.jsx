@@ -38,7 +38,7 @@ const Navbar = ({numCartItems, totalValue}) => {
                         </button>
                     </div> */}
                     <div className="flex justify-center items-center gap-2">
-                        <Link to="/cart" className="relative rounded-full">
+                        <Link to={`/koszyk/${localStorage.getItem("cart_code")}`} className="relative rounded-full">
                             <MdOutlineShoppingCart size={32} color="#2b2b2b" />
                             {numCartItems > 0 && (
                             <span

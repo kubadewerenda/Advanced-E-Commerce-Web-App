@@ -60,3 +60,27 @@ def cart(request, cart_code):
         return Response(serializer.data)
     except Cart.DoesNotExist:
         return Response({"error": "Nie ma takiego koszyka."}, status=404)
+    
+@api_view(["PATCH"])
+def ci_up_quantity(request):
+    try:
+        cartitem_id = request.data.get("item_id")
+        quantity = request.data.get("quantity")
+        quantity = int(quantity)
+        cartitem = CartItem.objects.get(id=cartitem_id)
+        cartitem.quantity = quantity
+        cartitem.save()
+        serializer = CartItemSerializer(cartitem)
+        return Response({"data": serializer.data, "message": "Pomyślnie zaktualizowano ilość!"})
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
+    
+@api_view(["POST"])
+def ci_delete(request):
+    try:
+        cartitem_id = request.data.get("item_id")
+        cartitem = CartItem.objects.get(id=cartitem_id)
+        cartitem.delete()
+        return Response({"message": "Usunięto produkt z koszyka!"}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400) 
