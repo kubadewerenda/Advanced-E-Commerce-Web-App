@@ -25,15 +25,13 @@ const App = () => {
         }
     }, [])
 
-    console.log(totalValue)
-
     return (
         <BrowserRouter>
             <MainLayout numCartItems={numCartItems} totalValue={totalValue}>
                 <Routes>
                     <Route path="/shop" element={<Shop />} />
                     <Route path="products/:slug" element={<ProductDetails setNumCartItems={setNumCartItems} setTotalValue={setTotalValue} />} />
-                    <Route path="koszyk/:cart_code" element={<Cart setNumCartItems={setNumCartItems}/>} />
+                    <Route path="koszyk/:cart_code" element={<Cart setNumCartItems={setNumCartItems} setTotalValue={setTotalValue}/>} />
                 </Routes> 
             </MainLayout>         
         </BrowserRouter>

@@ -1,12 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import api, { BASE_URL } from '../../api/api'
 import CustomNumInput from '../ui/CustomInputs/CustomNumInput'
 import { GiTrashCan } from "react-icons/gi"
 
-const CartItemCard = ({item}) => {
+const CartItemCard = ({item, cartItems, setCartItems, cartTotal, setCartTotal, setNumCartItems, setTotalValue}) => {
     const [quantity, setQuantity] = useState(item.quantity)
+    const [actualTotal, setActualTotal] = useState(item.total)
+    const [regularPrice, setRegularPrice] = useState(item.variant.price * item.quantity)
+    const [loading, setLoading] = useState(false)
+
+    const firstRender = useRef(true)
+    const prevQuantity = useRef(quantity)
 
     const itemID = {item_id: item.id}
+    const itemData = {item_id: item.id, quantity: quantity}
 
     function deleteCartItem(){
         const confirmDelete = window.confirm("Napewno chcesz usunąć produkt?")
@@ -14,6 +21,17 @@ const CartItemCard = ({item}) => {
             api.post("api/ci_delete/", itemID)
             .then(res => {
                 console.log(res.data)
+
+                setCartItems(cartItems.filter(cartItem => cartItem.id != item.id))
+                
+                setCartTotal(cartItems.filter(cartItem => cartItem.id != item.id)
+                .reduce((acc, curr) => acc + curr.total, 0))
+
+                setTotalValue(cartItems.filter(cartItem => cartItem.id != item.id)
+                .reduce((acc, curr) => acc + curr.total, 0))
+
+                setNumCartItems(cartItems.filter(cartItem => cartItem.id != item.id)
+                .reduce((acc, curr) => acc + curr.quantity, 0))
             })
             .catch(err => {
                 console.log(err.message)
@@ -21,9 +39,42 @@ const CartItemCard = ({item}) => {
         }
     }
 
-    const regularPrice = item.variant.price * item.quantity
-    const itemPrice = item.variant.discount_price ? <p className="text-orange-600 text-xl font-medium"><span className="line-through text-gray-700 mr-2">{regularPrice} zł</span>{item.total} zł</p> : 
-                    <p className="text-gray-700 text-xl font-medium">{item.total} zł</p>
+    useEffect(() => {
+        if(firstRender.current){
+            firstRender.current = false
+            prevQuantity.current = quantity
+        }
+
+        if(prevQuantity.current === quantity) return
+        prevQuantity.current == quantity
+
+        setLoading(true)
+        api.patch("api/ci_up_quantity/", itemData)
+        .then(res => {
+            console.log(res.data)
+
+            setCartTotal(cartItems.map((cartItem) => cartItem.id === item.id ? res.data.data : cartItem)
+            .reduce((acc, curr) => acc + curr.total, 0))
+
+            setNumCartItems(cartItems.map((cartItem) => cartItem.id === item.id ? res.data.data : cartItem)
+            .reduce((acc, curr) => acc + curr.quantity, 0))
+
+            setTotalValue(cartItems.map((cartItem) => cartItem.id === item.id ? res.data.data : cartItem)
+            .reduce((acc, curr) => acc + curr.total, 0))
+
+            setRegularPrice(res.data.data.variant.price * res.data.data.quantity)
+            setActualTotal(res.data.data.total)
+
+            setLoading(false)
+        })
+        .catch(err => {
+            console.log(err.message)
+            setLoading(false)
+        })
+    }, [quantity])
+
+    const itemPrice = item.variant.discount_price ? <p className="text-orange-600 text-xl font-medium"><span className="line-through text-gray-700 mr-2">{regularPrice} zł</span>{actualTotal} zł</p> : 
+                    <p className="text-gray-700 text-xl font-medium">{actualTotal} zł</p>
 
     return (
         <div className="flex justify-between w-full items-center gap-5 bg-gray-300 p-3">
