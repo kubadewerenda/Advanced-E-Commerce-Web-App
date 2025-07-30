@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import api from "../api/api"
 import useCartData from "../hooks/useCartData"
 import CartItems from "../components/Cart/CartItems"
+import CartSummary from "../components/Cart/CartSummary"
 
 
 const Cart = ({setNumCartItems, setTotalValue}) => {
@@ -30,6 +31,9 @@ const Cart = ({setNumCartItems, setTotalValue}) => {
                   setNumCartItems={setNumCartItems}
                   setTotalValue={setTotalValue}
               />  
+              <CartSummary 
+                cartTotal={cartTotal}
+              />
           </div>
       </div>
     )
