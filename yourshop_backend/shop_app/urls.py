@@ -1,8 +1,17 @@
-from django.urls import path
-from . import views
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.http import JsonResponse
+from django.conf import settings
 
 urlpatterns = [
-    path("api/products", views.products, name="products"),
-    path("api/products/<slug:slug>", views.product_detail, name="product_detail"),
-    path("api/categories/", views.categories, name="categories"),
+    path('admin/', admin.site.urls),
+
+    path('api/', include('apps.products.urls')),
+    path('api/', include('apps.categories.urls')),
+    path('api/', include('apps.cart.urls')),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

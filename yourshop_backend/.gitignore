@@ -1,0 +1,21 @@
+.env
+db.sqlite3
+db_dump.json
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+.DS_Store
+
+# env/secrety
+.env
+
+# opcjonalnie IDE
+.vscode/
+.idea/
