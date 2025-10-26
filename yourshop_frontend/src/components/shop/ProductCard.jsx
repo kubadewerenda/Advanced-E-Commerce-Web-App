@@ -3,7 +3,7 @@ import { BASE_URL } from '../../api/api'
 import { Link } from 'react-router-dom'
 
 const ProductCard = ({product}) => {
-    const moreVariantsPrice = product.variants.length > 1 ? "od" : ""
+    const moreVariantsPrice = product?.variants && product?.variants.length > 1 ? "od" : ""
     return (
         <div className="relative bg-gray-200 rounded-xl shadow-md flex transition hover:scale-105 hover:shadow-xl duration-200 min-w-[340px] min-h-[180px] max-w-full p-2 gap-2">
             <Link to={`/products/${product.slug}`}>

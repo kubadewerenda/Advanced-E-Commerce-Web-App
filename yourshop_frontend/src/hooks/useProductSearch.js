@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 
 const DEFAULTS = {
     page: 1,
-    page_size: 2,
+    // page_size: 2,
     q: "",
     ordering: "",
     category: "",
@@ -39,7 +39,7 @@ export default function useProductSearch() {
     const priceMin = getParam(searchParams, "price_min")
     const priceMax = getParam(searchParams, "price_max")
     const page = getParam(searchParams, "page")
-    const pageSize = getParam(searchParams, "page_size")
+    // const pageSize = getParam(searchParams, "page_size")
 
     const setFilter = useCallback((params) => {
         const sp = new URLSearchParams(window.location.search)
@@ -70,7 +70,7 @@ export default function useProductSearch() {
             if(priceMax) params.push(`price_max=${priceMax}`)
 
             params.push(`page=${page}`)
-            params.push(`page_size=${pageSize}`)
+            // params.push(`page_size=${pageSize}`)
 
             const url = `api/products?${params.join("&")}`
 
@@ -97,7 +97,7 @@ export default function useProductSearch() {
             if(debounceTimeout.current) clearTimeout(debounceTimeout.current)
         }
 
-    }, [q, ordering, category, subcategory, priceMin, priceMax, page, pageSize])
+    }, [q, ordering, category, subcategory, priceMin, priceMax, page])
 
     return {
         products, loading, error, totalCount,
@@ -115,8 +115,8 @@ export default function useProductSearch() {
         setPriceTo: val => setFilter({price_max: val}),
         currentPage: page, 
         setCurrentPage: val => setFilter({page: val}),
-        pageSize,
-        setPageSize: val => setFilter({page_size: val}),
+        // pageSize,
+        // setPageSize: val => setFilter({page_size: val}),
         resetFilters,
         generateLink: () => `/shop?${searchParams.toString()}`
     }
