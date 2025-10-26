@@ -1,1 +1,56 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.so
+*.egg-info/
+.eggs/
+.Python
+pip-wheel-metadata/
+*.manifest
+*.spec
+
+# --- Envy / secrets ---
+.env
+.env.*
+*.env
+.venv/
 venv/
+ENV/
+env/
+
+# --- Django ---
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+static_root/
+# jeśli generujesz collectstatic do /static/, też ignoruj:
+# static/
+
+# --- Testy / narzędzia ---
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.pyre/
+.hypothesis/
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Node (jeśli używasz) ---
+node_modules/
+dist/
+build/
+
+# --- Logs ---
+*.log
+logs/
