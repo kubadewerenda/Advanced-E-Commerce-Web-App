@@ -1,24 +1,32 @@
+# apps/users/admin.py
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import CustomUser
 
-# Register your models here.
-class CustomUserAdmin(UserAdmin):
+@admin.register(CustomUser)
+class CustomUserAdmin(BaseUserAdmin):
     model = CustomUser
+    ordering = ('email',)
+    list_display  = ('email', 'first_name', 'last_name', 'is_staff', 'is_superuser', 'is_active')
+    list_filter   = ('is_staff', 'is_superuser', 'is_active',)
+    search_fields = ('email', 'first_name', 'last_name')
 
-    # to co narazie wyswietlone w panelu admina
-    list_display = ("email", "first_name", "last_name", "discount_percent", "is_staff")
-
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {"fields": ("discount_percent",)}),
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'phone_number')}),
+        ('Company', {'fields': ('is_company', 'company_name', 'tax_number')}),
+        ('Address', {'fields': ('address', 'postal_code', 'city')}),
+        ('Permissions', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+        }),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
 
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {"fields": ("discount_percent",)}),
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'first_name', 'last_name', 'password1', 'password2'),
+        }),
     )
 
-    search_fields = ("email", "first_name", "last_name")
-    ordering = ("email",)
-
-
-admin.site.register(CustomUser, CustomUserAdmin)
+    filter_horizontal = ('groups', 'user_permissions',)

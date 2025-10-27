@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     #--- apps
     'apps.users',
     'apps.products',
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
 
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -45,7 +47,13 @@ MIDDLEWARE = [
 ]
 
 #Allowed hosts cors
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:3000',
+]
+CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
@@ -109,6 +117,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
     # ...
     'EXCEPTION_HANDLER': 'apps.core.exceptions.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': [
@@ -116,6 +130,26 @@ REST_FRAMEWORK = {
     ],
     'JSON_INDENT': 4,
 }
+
+# JWT
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    # 'SIGNING_KEY': os.getenv('JWT_SIGNING_KEY', SECRET_KEY),  # optional, seperated key
+    'UPDATE_LAST_LOGIN': True,
+}
+
+# Cookies dla SPA (React na innym originie)
+JWT_COOKIE_SECURE = False         # True na prod (HTTPS)
+JWT_COOKIE_SAMESITE = 'Lax'       # lub "None" gdy masz inny origin + HTTPS
+JWT_COOKIE_DOMAIN = None          # na prod: np. ".twojadomena.com"
+JWT_ACCESS_COOKIE_NAME = 'access_token'
+JWT_REFRESH_COOKIE_NAME = 'refresh_token'
 
 
 # Internationalization
@@ -136,4 +170,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# User auth
 AUTH_USER_MODEL = 'users.CustomUser'
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
