@@ -14,6 +14,22 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id', 'discount_percent'
         ]
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "first_name", "last_name", "phone_number",
+            "is_company", "company_name", "tax_number",
+            "address", "postal_code", "city",
+        ]
+
+    def validate(self, attrs):
+        for k, v in list(attrs.items()):
+            if isinstance(v, str):
+                vv = v.strip()
+                attrs[k] = vv or v 
+        return attrs
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, trim_whitespace=False)
