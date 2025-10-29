@@ -90,3 +90,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     def __str__(self):
         return f'{self.email} ({self.first_name} {self.last_name})'
+    
+# --- TODO: ---
+# 1.usunac wszystko z danymi, bo mamy nowa tabele shipping_adresses

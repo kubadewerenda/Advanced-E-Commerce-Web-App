@@ -10,3 +10,10 @@ def unique_slugify(instance, base_value: str, *, field: str = 'slug', queryset=N
         slug = f'{base}-{i}'
         i += 1
     return slug
+
+def get_instance_value(instance, attrs, name, default=None):
+            if attrs.get(name) is not None:
+                return attrs.get(name)
+            if instance is not None:
+                return getattr(instance, name, default)
+            return default
