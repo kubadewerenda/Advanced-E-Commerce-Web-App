@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     
     #--- apps
     'apps.users',
+    'apps.shipping',
     'apps.products',
     'apps.categories',
     'apps.cart',
