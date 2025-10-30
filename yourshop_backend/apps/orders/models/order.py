@@ -1,6 +1,8 @@
 from django.db import models
 from .base_model import BaseModel
 from django.conf import settings
+from apps.shipping.models import DeliveryMethod
+from .payment_method import PaymentMethod
 
 class OrderStatus(models.TextChoices):
     DRAFT = 'draft', 'Draft'
@@ -25,6 +27,10 @@ class Order(BaseModel):
         null=True,
         blank=True,
     )
+
+    delivery_method = models.ForeignKey(DeliveryMethod, null=True, blank=True, on_delete=models.SET_NULL, related_name='orders')
+    payment_method = models.ForeignKey(PaymentMethod, null=True, blank=True, on_delete=models.SET_NULL, related_name='orders')
+
     status = models.CharField(max_length=20, choices=OrderStatus.choices, default=OrderStatus.PENDING)
     payment_status = models.CharField(max_length=20,choices=PaymentStatus, default=PaymentStatus.NOT_PAID)
 
@@ -42,6 +48,10 @@ class Order(BaseModel):
     shipping_phone = models.CharField(max_length=30, blank=True)
     shipping_email = models.EmailField(max_length=254, blank=True)
 
+    delivery_method_name = models.CharField(max_length=120, blank=True)
+    payment_method_name = models.CharField(max_length=120, blank=True)
+
+    payment_fee_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     subtotal_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     shipping_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
