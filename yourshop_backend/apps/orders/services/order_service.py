@@ -1,11 +1,12 @@
 from decimal import Decimal
 from django.db import transaction
 from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
-from apps.orders.models import Order, OrderItem, OrderStatus, PaymentStatus
+from apps.orders.models import Order, OrderItem, OrderStatus, PaymentStatus, PaymentMethod
 from apps.cart.models.cart import Cart
 from apps.cart.models.cart_item import CartItem
 from apps.products.models.product_variant import ProductVariant
-from apps.shipping.models import ShippingAddress
+from apps.shipping.models import ShippingAddress, DeliveryMethod
+
 from typing import Optional
 from django.db.models import QuerySet
 
@@ -145,9 +146,28 @@ class OrderService:
 
         OrderItem.objects.bulk_create(to_create)
 
-        shipping_amount = self._calc_shipping_cost(subtotal).quantize(CENT)
+        dm = DeliveryMethod.objects.get(id=payload['delivery_method_id'], is_active=True)
+        pm = PaymentMethod.objects.get(id=payload['payment_method_id'], is_actice=True)
+
+        # Including delivery price, or if free, then free
+        if dm.free_from is not None and subtotal >= dm.free_from:
+            shipping_amount = Decimal('0.00')
+        else: 
+            shipping_amount = dm.fixed_price.quantize(CENT)
+
         discount_amount = self._calc_discounts(request_user, subtotal).quantize(CENT)
-        total = (subtotal + shipping_amount - discount_amount).quantize(CENT)
+
+        tmp_total = (subtotal + shipping_amount - discount_amount).quantize(CENT)
+
+        fee_percent = (pm.fee_percent or Decimal('0')) / Decimal('100')
+        payment_fee_amonut = (tmp_total * fee_percent + (pm.fee_flat or Decimal('0'))).quantize(CENT)
+
+        total = (tmp_total + payment_fee_amonut)
+
+        order.delivery_method = dm
+        order.payment_method = pm
+        order.delivery_method_name = dm.name
+        order.payment_method_name = pm.name
 
         order.subtotal_amount = subtotal
         order.shipping_amount = shipping_amount

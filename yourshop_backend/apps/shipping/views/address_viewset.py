@@ -2,8 +2,8 @@ from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.shipping.serializers.shipping_serializer import ShippingAddressSerializer
-from apps.shipping.services.shipping_service import ShippingAddressService
+from apps.shipping.serializers.address_serializer import ShippingAddressSerializer
+from apps.shipping.services.address_service import ShippingAddressService
 from apps.shipping.models import ShippingAddress
 
 class ShippingAddressViewSet(viewsets.ViewSet):

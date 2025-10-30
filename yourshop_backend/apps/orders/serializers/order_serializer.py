@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from apps.orders.models import Order, OrderItem
+from apps.orders.models import Order, OrderItem, PaymentMethod
+from apps.shipping.models import DeliveryMethod
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,17 +19,22 @@ class OrderSerializer(serializers.ModelSerializer):
             'shipping_street','shipping_house_number','shipping_apartament_number','shipping_postal_code',
             'shipping_city','shipping_country','shipping_phone','shipping_email',
             'subtotal_amount','shipping_amount','discount_amount','total_amount',
+            'delivery_method_name', 'payment_method_name', 'payment_fee_amount',
             'items','created_at','modified_at'
         ]
         read_only_fields = [
             'id','status','payment_status','subtotal_amount','shipping_amount',
-            'discount_amount','total_amount','created_at','modified_at'
+            'discount_amount','total_amount','created_at','modified_at',
+            'delivery_method_name', 'payment_method_name', 'payment_fee_amount',
         ]
 
 class OrderCheckoutSerializer(serializers.Serializer):
     cart_code = serializers.CharField(required=False, allow_blank=False)
 
     address_id = serializers.IntegerField(required=False)
+
+    delivery_method_id = serializers.IntegerField(required=True)
+    payment_method_id = serializers.IntegerField(required=True)
 
     shipping_first_name = serializers.CharField(required=False, max_length=50)
     shipping_last_name = serializers.CharField(required=False, max_length=80, allow_blank=True)
@@ -66,6 +72,14 @@ class OrderCheckoutSerializer(serializers.Serializer):
             missing = [f for f in required if not attrs.get(f)]
             if missing:
                 raise serializers.ValidationError({'shipping': f'Missing fields: {", ".join(missing)}'})
+            
+        dm = DeliveryMethod.objects.filter(id=attrs.get('delivery_method_id'), is_active=True).first()
+        pm = PaymentMethod.objects.filter(id=attrs.get('payment_method_id'), is_active=True).first()
+
+        if not dm:
+            raise serializers.ValidationError({'delivery_method': 'Invalid delivery method.'})
+        if not pm:
+            raise serializers.ValidationError({'payment_method': 'Invalid payment method.'})
         
         return attrs
 
