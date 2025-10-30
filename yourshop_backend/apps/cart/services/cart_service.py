@@ -14,24 +14,31 @@ class AddToCartResult:
 
 
 class CartService:
-    # -------- helpers --------
-    def _get_or_create_cart(self, cart_code: Optional[str]) -> Cart:
+    def _get_or_create_cart(self, user, cart_code: Optional[str]) -> Cart:
+        if user.is_authenticated:
+            cart = Cart.objects.filter(user=user, paid=False).first()
+            if not cart:
+                return Cart.objects.create(user=user)
+            else:
+                return cart
+        # guest cart, if not signed in
         if cart_code:
             cart = Cart.objects.filter(cart_code=cart_code, paid=False).first()
-            if cart:
+            if not cart:
+                return Cart.objects.create()
+            else:
                 return cart
-        return Cart.objects.create()
 
-    def add_item(self, cart_code: Optional[str], variant_sku: str, quantity: int) -> AddToCartResult:
+    def add_item(self, user, cart_code: Optional[str], variant_sku: str, quantity: int) -> AddToCartResult:
         if not variant_sku:
-            raise ValidationError('MISSING_VARIANT_SKU')
+            raise ValidationError('Missing variant SKU.')
 
         try:
             variant = ProductVariant.objects.get(sku=variant_sku)
         except ProductVariant.DoesNotExist:
-            raise ObjectDoesNotExist('VARIANT_NOT_FOUND')
+            raise ObjectDoesNotExist('Variant not found.')
 
-        cart = self._get_or_create_cart(cart_code)
+        cart = self._get_or_create_cart(user, cart_code)
 
         item, created = CartItem.objects.get_or_create(cart=cart, variant=variant)
         if created:
@@ -50,9 +57,12 @@ class CartService:
 
     def update_item_quantity(self, item_id: int, quantity: int) -> CartItem:
         if quantity is None:
-            raise ValidationError('MISSING_QUANTITY')
+            raise ValidationError('Missing quantity.')
         item = CartItem.objects.get(id=item_id)
-        item.quantity = int(quantity)
+        if quantity <= item.variant.stock:
+            item.quantity = int(quantity)
+        else:
+            raise ValidationError('Quantity of this item is overstock.')
         item.save()
         return item
 

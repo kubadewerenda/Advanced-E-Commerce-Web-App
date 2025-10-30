@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'apps.products',
     'apps.categories',
     'apps.cart',
+    'apps.orders',
     'apps.core',
 
     'corsheaders',

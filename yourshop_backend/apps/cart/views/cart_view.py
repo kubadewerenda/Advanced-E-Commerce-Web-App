@@ -26,7 +26,7 @@ class CartViewSet(viewsets.ViewSet):
             return Response({'error': 'There is not variant sku in params.'}, status=400)
 
         try:
-            result = svc.add_item(cart_code, variant_sku, quantity)
+            result = svc.add_item(request.user, cart_code, variant_sku, quantity)
         except ObjectDoesNotExist:
             return Response({'error': 'Product variant does not exists.'}, status=404)
         except ValidationError as e:
