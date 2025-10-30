@@ -79,9 +79,6 @@ class OrderService:
     def _unit_price_for_variant(self, variant: ProductVariant) -> Decimal:
         return variant.discount_price if variant.discount_price is not None else variant.price
 
-    def _calc_shipping_cost(self, subtotal: Decimal) -> Decimal:
-        return Decimal('0.00') if subtotal >= Decimal('200.00') else Decimal('15.00')
-
     def _calc_discounts(self, user, subtotal: Decimal) -> Decimal:
         return Decimal('0.00')
 
@@ -104,20 +101,29 @@ class OrderService:
             raise ValidationError('Cart is empty.')
 
         if getattr(request_user, "is_authenticated", False) and payload.get('address_id'):
-            address = (ShippingAddress.objects
-                        .filter(id=payload['address_id'], user=request_user, is_active=True)
-                        .first())
+            address = (
+                ShippingAddress.objects
+                    .filter(id=payload['address_id'], user=request_user, is_active=True)
+                    .first()
+            )
             if not address:
                 raise NotFound('Shipping address not found.')
             shipping = self._get_shipping_snapshot_from_address(address)
         else:
             shipping = self._get_shipping_snapshot_from_payload(payload)
 
+        dm = DeliveryMethod.objects.get(id=payload['delivery_method_id'], is_active=True)
+        pm = PaymentMethod.objects.get(id=payload['payment_method_id'], is_active=True)
+
         order = Order.objects.create(
             user=request_user if getattr(request_user, "is_authenticated", False) else None,
+            delivery_method=dm,
+            payment_method=pm,
             status=OrderStatus.PENDING,
             payment_status=PaymentStatus.NOT_PAID,
             currency='PLN',
+            delivery_method_name=dm.name,
+            payment_method_name=pm.name,
             **shipping
         )
 
@@ -146,9 +152,6 @@ class OrderService:
 
         OrderItem.objects.bulk_create(to_create)
 
-        dm = DeliveryMethod.objects.get(id=payload['delivery_method_id'], is_active=True)
-        pm = PaymentMethod.objects.get(id=payload['payment_method_id'], is_actice=True)
-
         # Including delivery price, or if free, then free
         if dm.free_from is not None and subtotal >= dm.free_from:
             shipping_amount = Decimal('0.00')
@@ -163,11 +166,6 @@ class OrderService:
         payment_fee_amonut = (tmp_total * fee_percent + (pm.fee_flat or Decimal('0'))).quantize(CENT)
 
         total = (tmp_total + payment_fee_amonut)
-
-        order.delivery_method = dm
-        order.payment_method = pm
-        order.delivery_method_name = dm.name
-        order.payment_method_name = pm.name
 
         order.subtotal_amount = subtotal
         order.shipping_amount = shipping_amount
