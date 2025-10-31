@@ -1,7 +1,7 @@
 from django.db import models
 from .base_model import BaseModel
 from django.conf import settings
-from apps.shipping.models import DeliveryMethod
+from apps.shipping.models import DeliveryMethod, AddressType
 from .payment_method import PaymentMethod
 
 class OrderStatus(models.TextChoices):
@@ -32,9 +32,10 @@ class Order(BaseModel):
     payment_method = models.ForeignKey(PaymentMethod, null=True, blank=True, on_delete=models.SET_NULL, related_name='orders')
 
     status = models.CharField(max_length=20, choices=OrderStatus.choices, default=OrderStatus.PENDING)
-    payment_status = models.CharField(max_length=20,choices=PaymentStatus, default=PaymentStatus.NOT_PAID)
+    payment_status = models.CharField(max_length=20,choices=PaymentStatus.choices , default=PaymentStatus.NOT_PAID)
 
     # snapshot shipping address
+    shipping_address_type = models.CharField(max_length=16, choices=AddressType.choices, default=AddressType.PERSONAL)
     shipping_first_name = models.CharField(max_length=50)
     shipping_last_name = models.CharField(max_length=80, blank=True)
     shipping_company_name = models.CharField(max_length=500, blank=True)
@@ -64,5 +65,5 @@ class Order(BaseModel):
         ordering = ['-created_at']
 
     def __str__(self):
-        uid = self.user.id or 'guest'
+        uid = self.user_id or 'guest'
         return f'Order #{self.id} ({uid})'

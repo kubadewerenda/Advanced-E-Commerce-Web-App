@@ -53,24 +53,25 @@ class OrderService:
         return cart
 
     def _get_shipping_snapshot_from_address(self, addr: ShippingAddress) -> dict:
-        return dict(
-            shipping_first_name=addr.first_name,
-            shipping_last_name=addr.last_name,
-            shipping_company_name=addr.company_name,
-            shipping_tax_number=addr.tax_number,
-            shipping_street=addr.street,
-            shipping_house_number=addr.house_number,
-            shipping_apartament_number=addr.apartament_number,
-            shipping_postal_code=addr.postal_code,
-            shipping_city=addr.city,
-            shipping_country=addr.country,
-            shipping_phone=addr.phone,
-            shipping_email=addr.email or '',
-        )
+        return {
+            'shipping_address_type': addr.address_type,
+            'shipping_first_name': addr.first_name,
+            'shipping_last_name': addr.last_name,
+            'shipping_company_name': addr.company_name,     # <-- firmowe
+            'shipping_tax_number': addr.tax_number,         # <-- firmowe
+            'shipping_street': addr.street,
+            'shipping_house_number': addr.house_number,
+            'shipping_apartament_number': addr.apartament_number,
+            'shipping_postal_code': addr.postal_code,       # <-- kod
+            'shipping_city': addr.city,
+            'shipping_country': addr.country,
+            'shipping_phone': addr.phone,
+            'shipping_email': addr.email or '',
+        }
 
     def _get_shipping_snapshot_from_payload(self, data: dict) -> dict:
         keys = [
-            'shipping_first_name', 'shipping_last_name', 'shipping_company_name', 'shipping_tax_number',
+            'shipping_address_type', 'shipping_first_name', 'shipping_last_name', 'shipping_company_name', 'shipping_tax_number',
             'shipping_street', 'shipping_house_number', 'shipping_apartament_number', 'shipping_postal_code',
             'shipping_city', 'shipping_country', 'shipping_phone', 'shipping_email'
         ]
