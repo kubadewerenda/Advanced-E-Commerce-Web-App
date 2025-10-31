@@ -28,6 +28,8 @@ class CartService:
                 return Cart.objects.create()
             else:
                 return cart
+        
+        return Cart.objects.create()
 
     def add_item(self, user, cart_code: Optional[str], variant_sku: str, quantity: int) -> AddToCartResult:
         if not variant_sku:
