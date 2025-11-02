@@ -1,6 +1,5 @@
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
-
 from apps.categories.serializers.category_serializer import CategorySerializer
 from apps.categories.services.category_service import CategoryService
 

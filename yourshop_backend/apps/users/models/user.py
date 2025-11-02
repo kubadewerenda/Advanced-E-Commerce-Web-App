@@ -3,10 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.db.models.functions import Lower
 from django.core.validators import MaxValueValidator, MinValueValidator
 from .base_model import BaseModel
-
-class UserRole(models.TextChoices):
-    USER = 'user', 'User'
-    ADMIN = 'admin', 'Admin'
+from apps.common.consts.users_consts import UserRole
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):

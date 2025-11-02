@@ -3,7 +3,6 @@ from rest_framework.exceptions import NotFound, ValidationError, PermissionDenie
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from apps.orders.models import PaymentMethod, PaymentProvider
 from apps.payments.services.payment_service import PaymentService
 from apps.payments.serializers.payment_serializer import PaymentItemSerializer
 

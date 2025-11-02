@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
-from apps.orders.models import PaymentMethod, PaymentProvider
+from apps.payments.models import PaymentMethod
+from apps.common.consts.payments_consts import PaymentProvider
 from django.db import transaction
 
 class PaymentService:

@@ -4,7 +4,6 @@ from rest_framework.response import Response
 
 from apps.shipping.serializers.address_serializer import ShippingAddressSerializer
 from apps.shipping.services.address_service import ShippingAddressService
-from apps.shipping.models import ShippingAddress
 
 class ShippingAddressViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]

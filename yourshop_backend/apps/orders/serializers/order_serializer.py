@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from apps.orders.models import Order, OrderItem, PaymentMethod
-from apps.shipping.models import DeliveryMethod, AddressType
+from apps.shipping.models import DeliveryMethod
+from apps.common.consts.shipping_consts import AddressType
 import re
 
 POSTAL_PL_RGX = re.compile(r'^\d{2}-\d{3}$')
@@ -16,18 +17,17 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            'id','status','payment_status','currency', 'shipping_address_type',
-            'shipping_first_name','shipping_last_name','shipping_company_name','shipping_tax_number',
-            'shipping_street','shipping_house_number','shipping_apartament_number','shipping_postal_code',
-            'shipping_city','shipping_country','shipping_phone','shipping_email',
+            'id','status','payment_status','currency', 'address_type',
+            'first_name','last_name','company_name','tax_number',
+            'street','house_number','apartament_number','postal_code',
+            'city','country','phone','email',
             'subtotal_amount','shipping_amount','discount_amount','total_amount',
-            'delivery_method_name', 'payment_method_name', 'payment_fee_amount',
-            'items','created_at','modified_at'
+            'payment_fee_amount', 'items','created_at','modified_at'
         ]
         read_only_fields = [
             'id','status','payment_status','subtotal_amount','shipping_amount',
             'discount_amount','total_amount','created_at','modified_at',
-            'delivery_method_name', 'payment_method_name', 'payment_fee_amount',
+            'payment_fee_amount',
         ]
 
 class OrderCheckoutSerializer(serializers.Serializer):
@@ -38,19 +38,19 @@ class OrderCheckoutSerializer(serializers.Serializer):
     delivery_method_id = serializers.IntegerField(required=True)
     payment_method_id = serializers.IntegerField(required=True)
 
-    shipping_address_type = serializers.CharField(required=False, max_length=16)
-    shipping_first_name = serializers.CharField(required=False, max_length=50)
-    shipping_last_name = serializers.CharField(required=False, max_length=80, allow_blank=True)
-    shipping_company_name = serializers.CharField(required=False, max_length=500, allow_blank=True)
-    shipping_tax_number = serializers.CharField(required=False, max_length=64, allow_blank=True)
-    shipping_street = serializers.CharField(required=False, max_length=255)
-    shipping_house_number = serializers.CharField(required=False, max_length=30)
-    shipping_apartament_number = serializers.CharField(required=False, max_length=30, allow_blank=True)
-    shipping_postal_code = serializers.CharField(required=False, max_length=30)
-    shipping_city = serializers.CharField(required=False, max_length=150)
-    shipping_country = serializers.CharField(required=False, max_length=100, default='Polska')
-    shipping_phone = serializers.CharField(required=False, max_length=30, allow_blank=True)
-    shipping_email = serializers.EmailField(required=False, allow_blank=True)
+    address_type = serializers.CharField(required=False, max_length=16)
+    first_name = serializers.CharField(required=False, max_length=50)
+    last_name = serializers.CharField(required=False, max_length=80, allow_blank=True)
+    company_name = serializers.CharField(required=False, max_length=500, allow_blank=True)
+    tax_number = serializers.CharField(required=False, max_length=64, allow_blank=True)
+    street = serializers.CharField(required=False, max_length=255)
+    house_number = serializers.CharField(required=False, max_length=30)
+    apartament_number = serializers.CharField(required=False, max_length=30, allow_blank=True)
+    postal_code = serializers.CharField(required=False, max_length=30)
+    city = serializers.CharField(required=False, max_length=150)
+    country = serializers.CharField(required=False, max_length=100, default='Polska')
+    phone = serializers.CharField(required=False, max_length=30, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
 
     def validate(self, attrs):
         user = self.context['request'].user
@@ -69,22 +69,22 @@ class OrderCheckoutSerializer(serializers.Serializer):
             return attrs
 
         required = [
-            'shipping_address_type', 'shipping_first_name', 'shipping_street',
-            'shipping_house_number', 'shipping_postal_code', 'shipping_city',
-            'shipping_country', 'shipping_email'
+            'address_type', 'first_name', 'street',
+            'house_number', 'postal_code', 'city',
+            'country', 'email'
         ]
         missing = [f for f in required if not attrs.get(f)]
         if missing:
             raise serializers.ValidationError({'shipping': f'Missing fields: {", ".join(missing)}'})
 
-        if attrs.get('shipping_address_type') == AddressType.COMPANY:
-            if not attrs.get('shipping_company_name'):
-                raise serializers.ValidationError({'shipping_company_name': 'Company name is required.'})
-            if not attrs.get('shipping_tax_number'):
-                raise serializers.ValidationError({'shipping_tax_number': 'Tax number is required.'})
+        if attrs.get('address_type') == AddressType.COMPANY:
+            if not attrs.get('company_name'):
+                raise serializers.ValidationError({'company_name': 'Company name is required.'})
+            if not attrs.get('tax_number'):
+                raise serializers.ValidationError({'tax_number': 'Tax number is required.'})
 
-        p_code = attrs.get('shipping_postal_code')
+        p_code = attrs.get('postal_code')
         if not POSTAL_PL_RGX.match(p_code):
-            raise serializers.ValidationError({'shipping_postal_code': 'Format must be XX-XXX.'})
+            raise serializers.ValidationError({'postal_code': 'Format must be XX-XXX.'})
 
         return attrs

@@ -1,6 +1,5 @@
-# from .payment_method import PaymentMethod, PaymentProvider
+from .payment_method import PaymentMethod
 
-# __all__ = [
-#     'PaymentMethod',
-#     'PaymentProvider',
-# ]
+__all__ = [
+    'PaymentMethod',
+]

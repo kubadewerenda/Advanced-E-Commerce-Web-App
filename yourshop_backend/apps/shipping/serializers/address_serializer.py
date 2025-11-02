@@ -1,7 +1,8 @@
 from rest_framework import serializers
 import re
 
-from apps.shipping.models import ShippingAddress, AddressType
+from apps.shipping.models import ShippingAddress
+from apps.common.consts.shipping_consts import AddressType
 from apps.common.utils import get_instance_value
 
 POSTAL_PL_RGX = re.compile(r'^\d{2}-\d{3}$')
@@ -19,13 +20,10 @@ class ShippingAddressSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         instance = getattr(self, 'instance', None)
         
-        a_type = get_instance_value(instance, attrs, 'address_type')
-        if a_type == AddressType.COMPANY:
-            c_name = get_instance_value(instance, attrs, 'company_name', '')
-            t_number = get_instance_value(instance, attrs, 'tax_number', '')
-            if not c_name:
+        if get_instance_value(instance, attrs, 'address_type') == AddressType.COMPANY:
+            if not get_instance_value(instance, attrs, 'company_name', ''):
                 raise serializers.ValidationError('Company name is required for company address.')
-            if not t_number:
+            if not get_instance_value(instance, attrs, 'tax_number', ''):
                 raise serializers.ValidationError('Tax number is required for company address.')
         p_code = get_instance_value(instance, attrs, 'postal_code', '')
         if not p_code or not  POSTAL_PL_RGX.match(p_code):
