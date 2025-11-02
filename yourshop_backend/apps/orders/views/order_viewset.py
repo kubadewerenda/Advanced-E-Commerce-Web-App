@@ -1,10 +1,8 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, ValidationError
 from apps.orders.serializers.order_serializer import OrderSerializer, OrderCheckoutSerializer
 from apps.orders.services.order_service import OrderService
-from apps.orders.models import Order
 
 class OrderViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]

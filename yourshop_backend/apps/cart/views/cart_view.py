@@ -2,7 +2,6 @@ from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-
 from apps.cart.serializers.cart_serializer import CartSerializer, CartItemSerializer, CartNumItemsSerializer
 from apps.cart.services.cart_service import CartService
 from apps.cart.models import Cart

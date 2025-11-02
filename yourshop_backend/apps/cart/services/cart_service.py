@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from typing import Optional
-
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from apps.cart.models import Cart, CartItem
 from apps.products.models import ProductVariant
@@ -28,7 +27,7 @@ class CartService:
                 return Cart.objects.create()
             else:
                 return cart
-        
+        # return cart anyway if not returned earlier
         return Cart.objects.create()
 
     def add_item(self, user, cart_code: Optional[str], variant_sku: str, quantity: int) -> AddToCartResult:

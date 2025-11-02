@@ -1,10 +1,7 @@
 from django.db import models
 from .base_model import BaseModel
 from django.conf import settings
-
-class AddressType(models.TextChoices):
-    PERSONAL = 'personal', 'Personal'
-    COMPANY = 'company', 'Company'
+from apps.common.consts.shipping_consts import AddressType
 
 class ShippingAddress(BaseModel):
     user = models.ForeignKey(

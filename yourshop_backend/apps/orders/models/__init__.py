@@ -1,12 +1,9 @@
-from .order import Order, OrderStatus, PaymentStatus
+from .order import Order
 from .order_item import OrderItem
-from .payment_method import PaymentMethod, PaymentProvider
+from ...payments.models.payment_method import PaymentMethod
 
 __all__ = [
     'Order', 
     'OrderItem', 
-    'OrderStatus', 
-    'PaymentStatus',
     'PaymentMethod',
-    'PaymentProvider',
 ]

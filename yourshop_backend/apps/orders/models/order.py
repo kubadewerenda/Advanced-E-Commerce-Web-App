@@ -1,23 +1,11 @@
 from django.db import models
 from .base_model import BaseModel
 from django.conf import settings
-from apps.shipping.models import DeliveryMethod, AddressType
-from .payment_method import PaymentMethod
-
-class OrderStatus(models.TextChoices):
-    DRAFT = 'draft', 'Draft'
-    PENDING = 'pending', 'Pending'
-    PAID = 'paid', 'Paid'
-    SHIPPED = 'shipped', 'Shipped',
-    COMPLETED = 'completed', 'Completed'
-    CANCELED = 'canceled', 'Canceled'
-
-class PaymentStatus(models.TextChoices):
-    NOT_PAID = 'not_paid', 'Not paid'
-    AUTHORIZED = 'authorized', 'Authorized'
-    PAID = 'paid', 'Paid'
-    REFUNDED = 'refunded', 'Refunded'
-    FAILED = 'failed', 'Failed'
+from apps.common.consts.orders_consts import OrderStatus
+from apps.common.consts.payments_consts import PaymentStatus
+from apps.common.consts.shipping_consts import AddressType
+from apps.shipping.models import DeliveryMethod
+from apps.payments.models import PaymentMethod
 
 class Order(BaseModel):
     user = models.ForeignKey(
@@ -28,29 +16,25 @@ class Order(BaseModel):
         blank=True,
     )
 
+    address_type = models.CharField(max_length=16, choices=AddressType.choices, default=AddressType.PERSONAL)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=80, blank=True)
+    company_name = models.CharField(max_length=500, blank=True)
+    tax_number = models.CharField(max_length=64, blank=True)
+    street = models.CharField(max_length=255)
+    house_number = models.CharField(max_length=30)
+    apartament_number = models.CharField(max_length=30, blank=True)
+    postal_code = models.CharField(max_length=30)
+    city = models.CharField(max_length=150)
+    country = models.CharField(max_length=100, default='Polska')
+    phone = models.CharField(max_length=30, blank=True)
+    email = models.EmailField(max_length=254, blank=True)
+
     delivery_method = models.ForeignKey(DeliveryMethod, null=True, blank=True, on_delete=models.SET_NULL, related_name='orders')
     payment_method = models.ForeignKey(PaymentMethod, null=True, blank=True, on_delete=models.SET_NULL, related_name='orders')
 
     status = models.CharField(max_length=20, choices=OrderStatus.choices, default=OrderStatus.PENDING)
     payment_status = models.CharField(max_length=20,choices=PaymentStatus.choices , default=PaymentStatus.NOT_PAID)
-
-    # snapshot shipping address
-    shipping_address_type = models.CharField(max_length=16, choices=AddressType.choices, default=AddressType.PERSONAL)
-    shipping_first_name = models.CharField(max_length=50)
-    shipping_last_name = models.CharField(max_length=80, blank=True)
-    shipping_company_name = models.CharField(max_length=500, blank=True)
-    shipping_tax_number = models.CharField(max_length=64, blank=True)
-    shipping_street = models.CharField(max_length=255)
-    shipping_house_number = models.CharField(max_length=30)
-    shipping_apartament_number = models.CharField(max_length=30, blank=True)
-    shipping_postal_code = models.CharField(max_length=30)
-    shipping_city = models.CharField(max_length=150)
-    shipping_country = models.CharField(max_length=100, default='Polska')
-    shipping_phone = models.CharField(max_length=30, blank=True)
-    shipping_email = models.EmailField(max_length=254, blank=True)
-
-    delivery_method_name = models.CharField(max_length=120, blank=True)
-    payment_method_name = models.CharField(max_length=120, blank=True)
 
     payment_fee_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     subtotal_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)

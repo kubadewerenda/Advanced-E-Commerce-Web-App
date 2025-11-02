@@ -1,7 +1,9 @@
 from decimal import Decimal
 from django.db import transaction
 from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
-from apps.orders.models import Order, OrderItem, OrderStatus, PaymentStatus, PaymentMethod
+from apps.orders.models import Order, OrderItem, PaymentMethod
+from apps.common.consts.payments_consts import PaymentStatus
+from apps.common.consts.orders_consts import OrderStatus
 from apps.cart.models.cart import Cart
 from apps.cart.models.cart_item import CartItem
 from apps.products.models.product_variant import ProductVariant
@@ -54,26 +56,26 @@ class OrderService:
 
     def _get_shipping_snapshot_from_address(self, addr: ShippingAddress) -> dict:
         return {
-            'shipping_address_type': addr.address_type,
-            'shipping_first_name': addr.first_name,
-            'shipping_last_name': addr.last_name,
-            'shipping_company_name': addr.company_name,     # <-- firmowe
-            'shipping_tax_number': addr.tax_number,         # <-- firmowe
-            'shipping_street': addr.street,
-            'shipping_house_number': addr.house_number,
-            'shipping_apartament_number': addr.apartament_number,
-            'shipping_postal_code': addr.postal_code,       # <-- kod
-            'shipping_city': addr.city,
-            'shipping_country': addr.country,
-            'shipping_phone': addr.phone,
-            'shipping_email': addr.email or '',
+            'address_type': addr.address_type,
+            'first_name': addr.first_name,
+            'last_name': addr.last_name,
+            'company_name': addr.company_name,   
+            'tax_number': addr.tax_number,        
+            'street': addr.street,
+            'house_number': addr.house_number,
+            'apartament_number': addr.apartament_number,
+            'postal_code': addr.postal_code,    
+            'city': addr.city,
+            'country': addr.country,
+            'phone': addr.phone,
+            'email': addr.email or '',
         }
 
     def _get_shipping_snapshot_from_payload(self, data: dict) -> dict:
         keys = [
-            'shipping_address_type', 'shipping_first_name', 'shipping_last_name', 'shipping_company_name', 'shipping_tax_number',
-            'shipping_street', 'shipping_house_number', 'shipping_apartament_number', 'shipping_postal_code',
-            'shipping_city', 'shipping_country', 'shipping_phone', 'shipping_email'
+            'address_type', 'first_name', 'last_name', 'company_name', 'tax_number',
+            'street', 'house_number', 'apartament_number', 'postal_code',
+            'city', 'country', 'phone', 'email'
         ]
         return {k: data.get(k, '') for k in keys}
 
@@ -123,8 +125,6 @@ class OrderService:
             status=OrderStatus.PENDING,
             payment_status=PaymentStatus.NOT_PAID,
             currency='PLN',
-            delivery_method_name=dm.name,
-            payment_method_name=pm.name,
             **shipping
         )
 

@@ -1,12 +1,7 @@
 from django.db import models
 from .base_model import BaseModel
 from django.conf import settings
-
-class PaymentProvider(models.TextChoices):
-    STRIPE = 'stripe', 'Stripe'
-    PAYU = 'payu', 'PayU'
-    P24 = 'p24', 'Przelewy24'
-    COD = 'cod', 'Płatność przy odbiorze'
+from apps.common.consts.payments_consts import PaymentProvider
 
 class PaymentMethod(BaseModel):
     code = models.CharField(max_length=50, unique=True, null=True, blank=True)
