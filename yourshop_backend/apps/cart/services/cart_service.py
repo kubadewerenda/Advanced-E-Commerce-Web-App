@@ -41,6 +41,9 @@ class CartService:
 
         cart = self._get_or_create_cart(user, cart_code)
 
+        # --- TODO: ---
+        # 1. dodac sprawdzanie quantity variantu.
+
         item, created = CartItem.objects.get_or_create(cart=cart, variant=variant)
         if created:
             item.quantity = int(quantity or 1)
@@ -56,17 +59,31 @@ class CartService:
     def get_detail_cart(self, cart_code: str) -> Cart:
         return Cart.objects.get(cart_code=cart_code, paid=False)
 
-    def update_item_quantity(self, item_id: int, quantity: int) -> CartItem:
+    def update_item_quantity(self, cart_code: str, item_id: int, quantity: int) -> CartItem:
+        cart = Cart.objects.get(cart_code=cart_code)
+        if not cart:
+            raise ObjectDoesNotExist('Cart does not exists.')
+
+        item = CartItem.objects.get(id=item_id, cart_id=cart.id)
+        if not item:
+            raise ObjectDoesNotExist('Cart item does not exists.')
+
         if quantity is None:
             raise ValidationError('Missing quantity.')
-        item = CartItem.objects.get(id=item_id)
         if quantity <= item.variant.stock:
             item.quantity = int(quantity)
         else:
             raise ValidationError('Quantity of this item is overstock.')
+        
         item.save()
         return item
 
-    def delete_item(self, item_id: int) -> None:
-        item = CartItem.objects.get(id=item_id)
+    def delete_item(self, cart_code: str, item_id: int) -> None:
+        cart = Cart.objects.get(cart_code=cart_code)
+        if not cart:
+            raise ObjectDoesNotExist('Cart does not exists.')
+
+        item = CartItem.objects.get(id=item_id, cart_id=cart.id)
+        if not item:
+            raise ObjectDoesNotExist('Cart item does not exists.')
         item.delete()
