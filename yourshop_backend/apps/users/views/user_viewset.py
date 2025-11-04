@@ -127,4 +127,5 @@ class UserViewSet(viewsets.ViewSet):
 # --- TODO: ----
 # 1. Dodać weryfikacje maila przy rejestracji
 # 2. Dodać oautha od google
+# 3. dodac zaleznosci, jaka firma tyle znizek itp(typ firmy np. masarnia)
 

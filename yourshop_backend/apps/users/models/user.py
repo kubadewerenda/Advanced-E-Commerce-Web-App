@@ -90,3 +90,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, BaseModel):
     
 # --- TODO: ---
 # 1.usunac wszystko z danymi, bo mamy nowa tabele shipping_adresses
+# 2. dodac zaleznosci, jaka firma tyle znizek itp(typ firmy np. masarnia)
+# 3. dane typu, laczna kwota zamowien, 
+
